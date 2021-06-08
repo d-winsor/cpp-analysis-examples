@@ -6,42 +6,58 @@ const which = require('which');
 
 var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
 
-try { 
-    // collect inputs
-    const outputFolder = core.getInput('sarif-output');
+function prepareOutputDir() {
+  var outputDir = core.getInput('sarif-output');
+  if (outputDir == '') {
+    throw 'sarif-output folder not set';
+  }
 
-    // ensure output folder has trailing slash for use in MSVC arguments
-    if (!outputFolder.endsWith('\\') && !outputFolder.endsWith('/')) {
-      outputFolder = outputFolder + '\\';
+  // make relative path relative to the repo root
+  if (!path.isAbsolute(outputDir)) {
+    outputDir = path.join(process.env.GITHUB_WORKSPACE, outputDir);
+  }
+
+  // ensure output folder has trailing slash for use in MSVC arguments
+  if (!outputDir.endsWith('\\') && !outputDir.endsWith('/')) {
+    outputDir = outputDir + '\\';
+  }
+
+  // create output folder if it doesn't already exist
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  // delete existing Sarif files
+  files = fs.readdirSync(outputDir, { withFileTypes: true });
+  files.forEach(file => {
+    if (file.isFile() && path.extname(file.name).toLowerCase() == '.sarif') {
+      fs.unlinkSync(path.join(outputDir, file.name));
     }
+  });
 
-    // find MSVC compiler
-    var clPath;
-    which('cl.exe', function(err, clPath) {
+  return outputDir;
+}
+
+function findMSVC() {
+  var clPath = '';
+  which('cl.exe', function(err, clPath) {
       if (err) throw err;
-    });
+  });
 
-    // TODO: version check MSVC compiler
+  // TODO: version check MSVC compiler
+  var version = '';
+
+  return version;
+}
+
+try { 
+    var version = findMSVC();
+    var outputDir = prepareOutputDir();
 
     // TODO: find EspXEngine.dll assuming Visual Studio compiler layout
 
     // redirect all analysis log files to 
-    clArgs.push('/analyze:log' + outputFolder);
-
-    // create output folder if it doesn't already exist
-    fs.mkdirSync(outputFolder);
-
-    // delete existing Sarif files in sarif-output folder
-    fs.readdirSync(outputFolder, (err, files) => {
-      if (err) throw err;
-      for (const file of files) {
-        if (path.extname(file).toLowerCase() == 'sarif') {
-          fs.unlinkSync(path.join(directory, file), err => {
-            if (err) throw err;
-          });
-        }
-      }
-    });
+    clArgs.push('/analyze:log' + outputDir);
 
     // add analysis arguments to _CL_ env variable
     core.exportVariable('_CL_', clArgs.join(' '));
