@@ -18,10 +18,15 @@ jobs:
       with:
         vs-version: '[16.7,]'
 
+    - name: Initialize MSVC Code Analysis
+      uses: ./msvc-code-analysis-action
+      with:
+        sarif-output: out/results
+
     - name: Build project
       run: msbuild MSBuildSolution.sln /t:rebuild
 
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v1
       with:
-        sarif_file: sarif
+        sarif_file: out/results
