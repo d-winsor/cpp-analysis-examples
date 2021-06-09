@@ -8,7 +8,7 @@ var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
 function prepareOutputDir() {
   var outputDir = core.getInput('sarif-output');
   if (outputDir == '') {
-    throw 'sarif-output folder not set';
+    throw new Error('sarif-output folder not set');
   }
 
   // make relative path relative to the repo root
@@ -51,7 +51,7 @@ function findMSVC() {
     }
   }
 
-  throw 'cl.exe is not accessible on the PATH';
+  throw new Error('cl.exe is not accessible on the PATH');
 }
 
 // EspXEngine.dll only exists in host/target bin for MSVC Visual Studio release
@@ -75,7 +75,7 @@ function getEspXEngine(clPath) {
       targetName = 'x64';
       break;
     default:
-      throw 'Unknown MSVC toolset layout';
+      throw new Error('Unknown MSVC toolset layout');
   }
 
   dllPath = path.join(hostDir, targetName, 'EspXEngine.dll');
@@ -84,7 +84,7 @@ function getEspXEngine(clPath) {
     return dllPath;
   }
 
-  throw 'Unable to fine EspXEngine.dll';
+  throw new Error('Unable to fine EspXEngine.dll');
 }
 
 try { 
