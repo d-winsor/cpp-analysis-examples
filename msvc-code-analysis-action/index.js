@@ -93,7 +93,7 @@ try {
     clArgs.push(util.format('/analyze:plugin"%s"', getEspXEngine(clPath)));
 
     var outputDir = prepareOutputDir();
-    clArgs.push(util.format('/analyze:log"%s"', outputDir));
+    clArgs.push(util.format('/analyze:log"%s/"', outputDir));
 
     // TODO: ruleset handling
 
