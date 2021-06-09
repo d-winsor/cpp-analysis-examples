@@ -21,6 +21,8 @@ function prepareOutputDir() {
     outputDir = outputDir + '\\';
   }
 
+  core.info("Using Sarif output folder: " + outputDir);
+
   // create output folder if it doesn't already exist
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -44,6 +46,7 @@ function findMSVC() {
   for (const pathDir of paths.split(';')) {
     const clPath = path.join(pathDir, 'cl.exe');
     if (fs.existsSync(clPath)) {
+      core.info("Found cl.exe at: " + clPath);
       return clPath;
     }
   }
@@ -58,6 +61,7 @@ function getEspXEngine(clPath) {
   // check if we already have the correct host/target pair
   var dllPath = path.join(clDir, 'EspXEngine.dll');
   if (fs.existsSync(dllPath)) {
+    core.info("Found EspXEngine.dll at: " + dllPath);
     return dllPath;
   }
 
@@ -75,11 +79,12 @@ function getEspXEngine(clPath) {
   }
 
   dllPath = path.join(hostDir, targetName, 'EspXEngine.dll');
-  if (!fs.existsSync(dllPath)) {
-    throw 'Unable to fine EspXEngine.dll';
+  if (fs.existsSync(dllPath)) {
+    core.info("Found EspXEngine.dll at: " + dllPath);
+    return dllPath;
   }
 
-  return dllPath;
+  throw 'Unable to fine EspXEngine.dll';
 }
 
 try { 
@@ -95,5 +100,6 @@ try {
     // add analysis arguments to _CL_ env variable
     core.exportVariable('_CL_', clArgs.join(' '));
 } catch (error) {
+  core.info("Failed to execute with error: " + error.message);
   core.setFailed(error.message);
 }
