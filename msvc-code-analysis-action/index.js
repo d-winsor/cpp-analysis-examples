@@ -6,7 +6,7 @@ const util = require('util');
 var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
 
 function prepareOutputDir() {
-  var outputDir = 'e:\\temp'; //core.getInput('sarif-output');
+  var outputDir = core.getInput('sarif-output');
   if (outputDir == '') {
     throw 'sarif-output folder not set';
   }
