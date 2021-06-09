@@ -3,7 +3,22 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
+var clArgs = ["/analyze:quiet", "/analyze:autolog:ext:sarif"];
+
+function quoteCompilerArg(arg) {
+  // find number of consecutive trailing backslashes
+  var i = 0;
+  while (i < arg.length && arg[arg.length - 1 - i] == '\\') {
+    i++;
+  }
+
+  // escape all trailing backslashes
+  if (i > 0) {
+    arg += new Array(i + 1).join('\\');
+  }
+
+  return '"' + arg + '"';
+}
 
 function prepareOutputDir() {
   var outputDir = core.getInput('sarif-output');
@@ -90,10 +105,10 @@ function getEspXEngine(clPath) {
 try { 
     var clPath = findMSVC();
     // TODO: version check MSVC compiler
-    clArgs.push(util.format('/analyze:plugin"%s"', getEspXEngine(clPath)));
+    clArgs.push(quoteCompilerArg(util.format('/analyze:plugin%s', getEspXEngine(clPath))));
 
     var outputDir = prepareOutputDir();
-    clArgs.push(util.format('/analyze:log"%s/"', outputDir));
+    clArgs.push(quoteCompilerArg(util.format('/analyze:log%s', outputDir)));
 
     // TODO: ruleset handling
 
