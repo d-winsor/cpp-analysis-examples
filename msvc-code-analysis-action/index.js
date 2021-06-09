@@ -41,9 +41,10 @@ function prepareOutputDir() {
 
 function findMSVC() {
   var paths = process.cwd() + ';' + process.env.PATH;
+  core.info('$paths=' + paths);
   for (const pathDir of paths.split(';')) {
-    core.info('$pathDir=' + pathDir);
     const clPath = path.join(pathDir, 'cl.exe');
+    core.info('$clPath=' + clPath);
     if (fs.existsSync(clPath) == true) {
       core.info("Found cl.exe at: " + clPath);
       return clPath;
