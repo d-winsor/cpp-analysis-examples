@@ -24,15 +24,15 @@ function prepareOutputDir() {
   core.info("Using Sarif output folder: " + outputDir);
 
   // create output folder if it doesn't already exist
-  if (!fs.exists(outputDir)) {
-    fs.mkdir(outputDir, { recursive: true });
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   }
 
   // delete existing Sarif files
-  files = fs.readdir(outputDir, { withFileTypes: true });
+  files = fs.readdirSync(outputDir, { withFileTypes: true });
   files.forEach(file => {
     if (file.isFile() && path.extname(file.name).toLowerCase() == '.sarif') {
-      fs.unlink(path.join(outputDir, file.name));
+      fs.unlinkSync(path.join(outputDir, file.name));
     }
   });
 
@@ -44,7 +44,7 @@ function findMSVC() {
   for (const pathDir of paths.split(';')) {
     core.info('$pathDir=' + pathDir);
     const clPath = path.join(pathDir, 'cl.exe');
-    if (fs.exists(clPath)) {
+    if (fs.existsSync(clPath)) {
       core.info("Found cl.exe at: " + clPath);
       return clPath;
     }
@@ -59,7 +59,7 @@ function getEspXEngine(clPath) {
 
   // check if we already have the correct host/target pair
   var dllPath = path.join(clDir, 'EspXEngine.dll');
-  if (fs.exists(dllPath)) {
+  if (fs.existsSync(dllPath)) {
     core.info("Found EspXEngine.dll at: " + dllPath);
     return dllPath;
   }
@@ -78,7 +78,7 @@ function getEspXEngine(clPath) {
   }
 
   dllPath = path.join(hostDir, targetName, 'EspXEngine.dll');
-  if (fs.exists(dllPath)) {
+  if (fs.existsSync(dllPath)) {
     core.info("Found EspXEngine.dll at: " + dllPath);
     return dllPath;
   }

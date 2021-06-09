@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "@actions/core": "^1.4.0",
-    "@actions/github": "^5.0.0",
-    "which": "^2.0.2"
+    "@actions/core": "^1.4.0"
   }
 }
