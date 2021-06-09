@@ -1,13 +1,12 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 const fs = require('fs');
 const path = require('path');
-const which = require('which');
+const util = require('util');
 
 var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
 
 function prepareOutputDir() {
-  var outputDir = core.getInput('sarif-output');
+  var outputDir = 'e:\\temp'; //core.getInput('sarif-output');
   if (outputDir == '') {
     throw 'sarif-output folder not set';
   }
@@ -39,25 +38,59 @@ function prepareOutputDir() {
 }
 
 function findMSVC() {
-  var clPath = '';
-  which('cl.exe', function(err, clPath) {
-      if (err) throw err;
-  });
+  var paths = process.cwd() + ';' + process.env.PATH;
+  clPath = '';
 
-  // TODO: version check MSVC compiler
-  var version = '';
+  for (const pathDir of paths.split(';')) {
+    const clPath = path.join(pathDir, 'cl.exe');
+    if (fs.existsSync(clPath)) {
+      return clPath;
+    }
+  }
 
-  return version;
+  throw 'cl.exe is not accessible on the PATH';
+}
+
+// EspXEngine.dll only exists in host/target bin for MSVC Visual Studio release
+function getEspXEngine(clPath) {
+  var clDir = path.dirname(clPath);
+
+  // check if we already have the correct host/target pair
+  var dllPath = path.join(clDir, 'EspXEngine.dll');
+  if (fs.existsSync(dllPath)) {
+    return dllPath;
+  }
+
+  var targetName = '';
+  var hostDir = path.dirname(clDir);
+  switch (path.basename(hostDir)) {
+    case 'HostX86':
+      targetName = 'x86';
+      break;
+    case 'HostX64':
+      targetName = 'x64';
+      break;
+    default:
+      throw 'Unknown MSVC toolset layout';
+  }
+
+  dllPath = path.join(hostDir, targetName, 'EspXEngine.dll');
+  if (!fs.existsSync(dllPath)) {
+    throw 'Unable to fine EspXEngine.dll';
+  }
+
+  return dllPath;
 }
 
 try { 
-    var version = findMSVC();
+    var clPath = findMSVC();
+    // TODO: version check MSVC compiler
+    clArgs.push(util.format('/analyze:plugin"%s"', getEspXEngine(clPath)));
+
     var outputDir = prepareOutputDir();
+    clArgs.push(util.format('/analyze:log"%s"', outputDir));
 
-    // TODO: find EspXEngine.dll assuming Visual Studio compiler layout
-
-    // redirect all analysis log files to 
-    clArgs.push('/analyze:log' + outputDir);
+    // TODO: ruleset handling
 
     // add analysis arguments to _CL_ env variable
     core.exportVariable('_CL_', clArgs.join(' '));
