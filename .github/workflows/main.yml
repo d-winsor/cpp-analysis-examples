@@ -23,12 +23,6 @@ jobs:
         arch: x86_amd64
         toolset: '14.29'
 
-    - name: Initialize MSVC Code Analysis
-      uses: ./msvc-code-analysis-action
-      with:
-        sarif-output: ${{ env.results }}
-        ruleset: All.ruleset
-
     - name: Build with analysis
       run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild /p:GenerateSarif=true
 
@@ -37,6 +31,12 @@ jobs:
       with:
         sarif_file: sarif
         category: Hardcoded
+
+    - name: Initialize MSVC Code Analysis
+      uses: ./msvc-code-analysis-action
+      with:
+        sarif-output: ${{ env.results }}
+        ruleset: All.ruleset
 
     - name: Build project
       run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild
