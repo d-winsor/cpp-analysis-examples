@@ -3,4 +3,9 @@
 		<OutDir>$(SolutionDir)\out\msbuild\$(Platform)\$(Configuration)\</OutDir>
 		<IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(GenerateSarif)'!=''">
+		<RunCodeAnalysis>true</RunCodeAnalysis>
+		<!-- Force generation of Sarif output only used in IDE -->
+		<VCCodeAnalysisUX>true</VCCodeAnalysisUX>
+	</PropertyGroup>
 </Project>

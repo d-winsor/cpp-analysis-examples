@@ -36,3 +36,12 @@ jobs:
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: ${{ env.results }}
+
+    - name: Build with analysis
+      run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild /p:GenerateSarif=true
+
+    - name: Upload hardcoded SARIF 
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: sarif
+        category: Hardcoded
