@@ -9,6 +9,6 @@
 		</CreateItem>
 
 		<Message Text="Copying Sarif Files..." />
-		<Copy SourceFiles="@(MyFilesToCopy)" DestinationFolder="$(SolutionDir)sarif" ContinueOnError="true" />
+		<Copy SourceFiles="@(MyFilesToCopy)" DestinationFolder="$(SolutionDir)out/results" ContinueOnError="true" />
 	</Target>
 </Project> 
