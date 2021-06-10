@@ -29,14 +29,6 @@ jobs:
         sarif-output: ${{ env.results }}
         ruleset: All.ruleset
 
-    - name: Build project
-      run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild
-
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: ${{ env.results }}
-
     - name: Build with analysis
       run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild /p:GenerateSarif=true
 
@@ -45,3 +37,11 @@ jobs:
       with:
         sarif_file: sarif
         category: Hardcoded
+
+    - name: Build project
+      run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ${{ env.results }}
