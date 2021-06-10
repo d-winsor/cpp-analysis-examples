@@ -27,7 +27,7 @@ jobs:
       uses: ./msvc-code-analysis-action
       with:
         sarif-output: ${{ env.results }}
-        ruleset: All.ruleset
+        ruleset: NativeRecommendedRules.ruleset
 
     - name: Build project
       run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild
