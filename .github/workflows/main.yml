@@ -7,8 +7,6 @@ on:
     branches: [ main ]
 
 env:
-  config: Release
-  arch: x86_amd64
   results: out/results
 
 jobs:
@@ -22,7 +20,7 @@ jobs:
     - name: Add MSVC to PATH
       uses: ilammy/msvc-dev-cmd@v1
       with:
-        arch: ${{ env.arch }}
+        arch: x86_amd64
         toolset: '14.29'
 
     - name: Initialize MSVC Code Analysis
@@ -32,7 +30,7 @@ jobs:
         ruleset: All.ruleset
 
     - name: Build project
-      run: msbuild MSBuildSolution.sln /p:Configuration=${{ env.config }} /p:Platform=${{ env.arch }} /t:rebuild
+      run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild
 
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v1

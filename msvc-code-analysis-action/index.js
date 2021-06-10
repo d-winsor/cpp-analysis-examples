@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-var clArgs = ["/analyze", "/analyze:log:format:sarif"];
+var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
 const relativeRulesetPath = "..\\..\\..\\..\\..\\..\\..\\Team Tools\\Static Analysis Tools\\Rule Sets";
 
 function quoteCompilerArg(arg) {
@@ -147,7 +147,6 @@ try {
 
     // add analysis arguments to _CL_ env variable
     core.exportVariable('_CL_', clArgs.join(' '));
-    core.exportVariable('CAEmitSarifLog', '1');
 } catch (error) {
   core.info("Failed to execute with error: " + error.message);
   core.setFailed(error.message);
