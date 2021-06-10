@@ -104,12 +104,12 @@ function configureRuleset(clArgs, clPath) {
 
   var finalizedPath = undefined;
   if (path.isAbsolute(rulesetPath) && fs.existsSync(rulesetPath)) {
-    finalizedPath = rulesetPath
+    finalizedPath = rulesetPath;
   } else {
     // check if ruleset specified can be found in the repo
-    const relativeRulesetPath = path.join(process.env.GITHUB_WORKSPACE, rulesetPath);
-    if (fs.existsSync(relativeRulesetPath)) {
-      finalizedPath = relativeRulesetPath;
+    const repoRulesetPath = path.join(process.env.GITHUB_WORKSPACE, rulesetPath);
+    if (fs.existsSync(repoRulesetPath)) {
+      finalizedPath = repoRulesetPath;
     }
   }
 
@@ -132,7 +132,7 @@ function configureRuleset(clArgs, clPath) {
     throw new Error('Unable to find ruleset file: ' + rulesetPath);
   }
 
-  clArgs.push(quoteCompilerArg(util.format('/analyze:rulesety%s', finalizedPath)));
+  clArgs.push(quoteCompilerArg(util.format('/analyze:ruleset%s', finalizedPath)));
 }
 
 try { 
