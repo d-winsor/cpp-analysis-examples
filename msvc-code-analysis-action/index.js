@@ -107,7 +107,7 @@ function configureRuleset(clArgs, clPath) {
     finalizedPath = rulesetPath
   } else {
     // check if ruleset specified can be found in the repo
-    const relativeRulesetPath = path.join('E:\\src\\cpp-analysis-examples', rulesetPath);
+    const relativeRulesetPath = path.join(process.env.GITHUB_WORKSPACE, rulesetPath);
     if (fs.existsSync(relativeRulesetPath)) {
       finalizedPath = relativeRulesetPath;
     }
