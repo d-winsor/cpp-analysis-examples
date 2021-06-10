@@ -26,10 +26,16 @@ jobs:
     - name: Build with analysis
       run: msbuild MSBuildSolution.sln /p:Configuration=Release /p:Platform=x64 /t:rebuild /p:GenerateSarif=true
 
-    - name: Upload hardcoded SARIF 
+    - name: Upload SARIF files
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: sarif
+
+    - name: Upload Sarif Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: sarif-files
+        path: ${{ env.results }}
 
     # - name: Initialize MSVC Code Analysis
     #   uses: ./msvc-code-analysis-action
