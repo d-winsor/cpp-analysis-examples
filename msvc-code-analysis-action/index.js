@@ -147,6 +147,7 @@ try {
 
     // add analysis arguments to _CL_ env variable
     core.exportVariable('_CL_', clArgs.join(' '));
+    core.exportVariable('CAEmitSarifLog', '1');
 } catch (error) {
   core.info("Failed to execute with error: " + error.message);
   core.setFailed(error.message);
