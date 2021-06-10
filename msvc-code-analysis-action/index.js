@@ -22,7 +22,7 @@ function quoteCompilerArg(arg) {
 }
 
 function prepareOutputDir() {
-  var outputDir = 'e:\\temp'; //core.getInput('sarif-output');
+  var outputDir = core.getInput('sarif-output');
   if (outputDir == '') {
     throw new Error('sarif-output folder not set');
   }
@@ -97,7 +97,7 @@ function getEspXEngine(clPath) {
 }
 
 function configureRuleset(clArgs, clPath) {
-  var rulesetPath = 'NativeRecommendedRules.ruleset'; //core.getInput('ruleset');
+  var rulesetPath = core.getInput('ruleset');
   if (rulesetPath == '') {
     return rulesetPath;
   }
