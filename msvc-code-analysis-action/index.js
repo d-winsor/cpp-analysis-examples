@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-var clArgs = ["/analyze:quiet", "/analyze:log:format:sarif"];
+var clArgs = ["/analyze", "/analyze:log:format:sarif"];
 const relativeRulesetPath = "..\\..\\..\\..\\..\\..\\..\\Team Tools\\Static Analysis Tools\\Rule Sets";
 
 function quoteCompilerArg(arg) {
