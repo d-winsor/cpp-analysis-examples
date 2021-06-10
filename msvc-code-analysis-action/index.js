@@ -4,6 +4,7 @@ const path = require('path');
 const util = require('util');
 
 var clArgs = ["/analyze:quiet", "/analyze:autolog:ext:sarif"];
+const relativeRulesetPath = "..\\..\\..\\..\\..\\..\\..\\Team Tools\\Static Analysis Tools\\Rule Sets";
 
 function quoteCompilerArg(arg) {
   // find number of consecutive trailing backslashes
@@ -21,7 +22,7 @@ function quoteCompilerArg(arg) {
 }
 
 function prepareOutputDir() {
-  var outputDir = core.getInput('sarif-output');
+  var outputDir = 'e:\\temp'; //core.getInput('sarif-output');
   if (outputDir == '') {
     throw new Error('sarif-output folder not set');
   }
@@ -35,8 +36,6 @@ function prepareOutputDir() {
   if (!outputDir.endsWith('\\') && !outputDir.endsWith('/')) {
     outputDir = outputDir + '\\';
   }
-
-  core.info("Using Sarif output folder: " + outputDir);
 
   // create output folder if it doesn't already exist
   if (!fs.existsSync(outputDir)) {
@@ -56,12 +55,9 @@ function prepareOutputDir() {
 
 function findMSVC() {
   var paths = process.cwd() + ';' + process.env.PATH;
-  core.info('$paths=' + paths);
   for (const pathDir of paths.split(';')) {
     const clPath = path.join(pathDir, 'cl.exe');
-    core.info('$clPath=' + clPath);
     if (fs.existsSync(clPath) == true) {
-      core.info("Found cl.exe at: " + clPath);
       return clPath;
     }
   }
@@ -76,7 +72,6 @@ function getEspXEngine(clPath) {
   // check if we already have the correct host/target pair
   var dllPath = path.join(clDir, 'EspXEngine.dll');
   if (fs.existsSync(dllPath)) {
-    core.info("Found EspXEngine.dll at: " + dllPath);
     return dllPath;
   }
 
@@ -95,11 +90,49 @@ function getEspXEngine(clPath) {
 
   dllPath = path.join(hostDir, targetName, 'EspXEngine.dll');
   if (fs.existsSync(dllPath)) {
-    core.info("Found EspXEngine.dll at: " + dllPath);
     return dllPath;
   }
 
-  throw new Error('Unable to fine EspXEngine.dll');
+  throw new Error('Unable to find EspXEngine.dll');
+}
+
+function configureRuleset(clArgs, clPath) {
+  var rulesetPath = 'NativeRecommendedRules.ruleset'; //core.getInput('ruleset');
+  if (rulesetPath == '') {
+    return rulesetPath;
+  }
+
+  var finalizedPath = undefined;
+  if (path.isAbsolute(rulesetPath) && fs.existsSync(rulesetPath)) {
+    finalizedPath = rulesetPath
+  } else {
+    // check if ruleset specified can be found in the repo
+    const relativeRulesetPath = path.join('E:\\src\\cpp-analysis-examples', rulesetPath);
+    if (fs.existsSync(relativeRulesetPath)) {
+      finalizedPath = relativeRulesetPath;
+    }
+  }
+
+  const rulesetDirectory = path.normalize(path.join(path.dirname(clPath), relativeRulesetPath));
+  if (fs.existsSync(rulesetDirectory)) {
+    // add official ruleset directory to resolve ruleset includes
+    clArgs.push(quoteCompilerArg(util.format('/analyze:rulesetdirectory%s', rulesetDirectory)));
+
+    // check if ruleset specified can be found in official rulesets in VS
+    const officialRulesetPath = path.join(rulesetDirectory, rulesetPath);
+    if (fs.existsSync(officialRulesetPath)) {
+      finalizedPath = officialRulesetPath;
+    }
+
+  } else if (finalizedPath == undefined) {
+    core.warning('Unable to find official rulesets shipped with Visual Studio');
+  }
+
+  if (finalizedPath == undefined || !fs.existsSync(finalizedPath)) {
+    throw new Error('Unable to find ruleset file: ' + rulesetPath);
+  }
+
+  clArgs.push(quoteCompilerArg(util.format('/analyze:rulesety%s', finalizedPath)));
 }
 
 try { 
@@ -110,7 +143,7 @@ try {
     var outputDir = prepareOutputDir();
     clArgs.push(quoteCompilerArg(util.format('/analyze:log%s', outputDir)));
 
-    // TODO: ruleset handling
+    configureRuleset(clArgs, clPath);
 
     // add analysis arguments to _CL_ env variable
     core.exportVariable('_CL_', clArgs.join(' '));

@@ -28,6 +28,7 @@ jobs:
       uses: ./msvc-code-analysis-action
       with:
         sarif-output: out/results
+        ruleset: All.ruleset
 
     - name: Build project
       run: msbuild MSBuildSolution.sln /p:Configuration=${{ env.config }} /p:Platform=${{ env.arch }} /t:rebuild
