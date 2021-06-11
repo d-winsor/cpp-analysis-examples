@@ -2,8 +2,8 @@
 //
 
 #include <iostream>
-
-// update...
+#include <vector>
+#include <optional>
 
 int main()
 {
@@ -19,11 +19,11 @@ int main()
 void RawPointerAssignment() {
 	// C26400: No Raw Pointer Assignment (r.11)
 	// C26409: Avoid call new or delete explicitly (r.11)
-	//char* buffer = new char[30];
+	char* buffer = new char[30];
 
 	// BUG: FIX
 	// C26481: Don't use pointer arithmetic. Use span instead (bounds.1)
-	//buffer[0] = 'a';
+	buffer[0] = 'a';
 }
 
 struct MyStruct {
@@ -64,8 +64,16 @@ void C26812(NoClassEnum badEnum) {
 
 }
 
-void C26815() {
+std::optional<std::vector<int>> getTempOptVec() {
+	return {};
+}
 
+void C26815() {
+	// C26815: There is a dangling pointer that is the result of an unnamed temporary that has been destroyed.
+	for (auto i : *getTempOptVec())
+	{
+		std::cout << i << std::endl;
+	}
 }
 
 void C26816() {
