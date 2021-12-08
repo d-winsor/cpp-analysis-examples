@@ -34,6 +34,17 @@ void RawPointerAssignment() {
 	buffer[0] = 'a';
 }
 
+int NullDereference()
+{
+	int* p = 0;
+	int q = 1;
+	if (q)
+	{
+		return *(p + 1);
+	}
+	return 0;
+}
+
 struct MyStruct {
 	int x = 3;
 	double y = 2.0;
