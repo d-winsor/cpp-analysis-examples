@@ -8,32 +8,28 @@ on:
 
 env:
   build: '${{ github.workspace }}/build'
+  config: 'Debug'
   result: '${{ github.workspace }}/build/results.sarif'
 
 jobs:
-  build:
-    name: Run Analysis
+  analyze:
+    name: Analyze
     runs-on: windows-latest
 
     steps:
     - name: Checkout action
       uses: actions/checkout@v2.3.4
 
-    - name: Initialize & Build
-      uses: lukka/run-cmake@v3
-      with:
-        cmakeListsTxtPath: ${{ github.workspace }}/CMakeLists.txt
-        buildDirectory: ${{ env.build }}
-        cmakeGenerator: VS16Win64
+    - name: Configure CMake
+      run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }}
       
     - name: Run Analysis
-      id: run-analysis
-      continue-on-error: true
       uses: microsoft/msvc-code-analysis-action@main
+      id: run-analysis
       with:
         cmakeBuildDirectory: ${{ env.build }}
+        buildConfiguration: ${{ env.config }}
         ruleset: All.ruleset
-        ignoreSystemHeaders: true
 
     - name: Upload SARIF to Github
       uses: github/codeql-action/upload-sarif@v1
