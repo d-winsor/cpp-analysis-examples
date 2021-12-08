@@ -12,7 +12,7 @@ env:
   result: '${{ github.workspace }}/build/results.sarif'
 
 jobs:
-  analyze:
+  build:
     name: Analyze
     runs-on: windows-latest
 
