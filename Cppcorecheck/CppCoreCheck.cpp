@@ -36,8 +36,8 @@ void RawPointerAssignment() {
 
 int NullDereference()
 {
-	int* p = 0;
-	int q = 1;
+	const int* p = 0;
+	const int q = 1;
 	if (q)
 	{
 		return *(p + 1);
