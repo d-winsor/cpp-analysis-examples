@@ -1,29 +1,44 @@
 // ConsoleApp.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
+// Trigger new workflow...
 
-// update...
+#include <iostream>
+#include <optional>
 
 int main()
 {
-	int* p = 0;
-	int q = 1;
-	if (q)
-	{
-		return *(p + 1);
-	}
 	return 0;
+}
+
+std::optional<int> getTempOptional() noexcept { return {}; }
+
+void RefrenceToTemp() noexcept
+{
+    if (const auto val = *getTempOptional()) // C26815
+    {
+        (void)val;
+    }
 }
 
 void RawPointerAssignment() {
 	// C26400: No Raw Pointer Assignment (r.11)
 	// C26409: Avoid call new or delete explicitly (r.11)
-	//char* buffer = new char[30];
+	char* buffer = new char[30];
 
-	// BUG: FIX
 	// C26481: Don't use pointer arithmetic. Use span instead (bounds.1)
-	//buffer[0] = 'a';
+	buffer[0] = 'a';
+}
+
+int NullDereference()
+{
+	const int* p = 0;
+	const int q = 1;
+	if (q)
+	{
+		return *(p + 1);
+	}
+	return 0;
 }
 
 struct MyStruct {
